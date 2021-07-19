@@ -28,9 +28,7 @@ def main():
         num_steps = args.steps
     
     game = cgol.ConwayGameOfLife(grid_size, interval_s, num_steps)
-    print(game.grid_size)
-    print(game.interval_s)
-    print(game.num_steps)
+    game.run()
 
 # call main
 if __name__ == '__main__':

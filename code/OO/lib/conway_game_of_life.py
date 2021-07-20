@@ -29,23 +29,27 @@ class ConwayGameOfLife():
 
         for row in range(self.grid_size):
             for col in range(self.grid_size):
-                new_grid[row][col] = self._get_new_grid_element_using_conways_rules(row, col, grid)
+                num_live_neighbours = self._get_number_of_live_neighbours(row, col, grid)
+                new_grid[row][col] = self._get_new_cell_state_using_conways_rules(num_live_neighbours, grid[row][col])
 
         return new_grid
 
-    def _get_new_grid_element_using_conways_rules(self, row, col, old_grid):
-        num_live_neighbours = 0
-        # TODO just do a simple sum of neighbours, no loops
-        for i in range(max(0, row-1), min(row+2, self.grid_size)):
-            for j in range(max(0, col-1), min(col+2, self.grid_size)):
-                if not (i == row and j == col):
-                    num_live_neighbours += old_grid[i][j]
-        
+    def _get_number_of_live_neighbours(self, row, col, grid):
+        # determine number of live neighbours
+        # Note, grid is an infinite (toiroidal) plane!
+        N = self.grid_size
+        return (
+            grid[(row-1)%N][(col-1)%N] + grid[(row-1)%N][col] + grid[(row-1)%N][(col+1)%N] +
+            grid[row][(col-1)%N] + grid[row][(col+1)%N] +
+            grid[(row+1)%N][(col-1)%N] + grid[(row+1)%N][col] + grid[(row+1)%N][(col+1)%N]
+        )
+
+    def _get_new_cell_state_using_conways_rules(self, num_live_neighbours, old_element):
         # Conway's rules to determine if the new cell is alive or dead
         # Taken from https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-        if old_grid[row][col] == 1 and num_live_neighbours in [2, 3]:
+        if old_element == 1 and num_live_neighbours in [2, 3]:
             return 1
-        elif old_grid[row][col] == 0 and num_live_neighbours == 3:
+        elif old_element == 0 and num_live_neighbours == 3:
             return 1
         else:
             return 0
@@ -53,7 +57,17 @@ class ConwayGameOfLife():
     def _visualize_grid(self, step, grid):
         print('')
         print('Step = {}'.format(step))
-        print(grid)
+        # print(grid)
+
+        output = ''
+        for row in grid:
+            for elem in row:
+                if elem == 0:
+                    output += ' '
+                else:
+                    output += 'O'
+            output += '\n'
+        print(output)
 
     def run(self):
         '''
